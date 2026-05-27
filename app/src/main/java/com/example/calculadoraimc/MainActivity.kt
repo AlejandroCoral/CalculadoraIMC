@@ -30,6 +30,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.calculadoraimc.ui.theme.CalculadoraIMCTheme
 
 class MainActivity : ComponentActivity() {
@@ -43,7 +47,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    PantallaIngreso()
+                    AppNavegacion()
                 }
             }
         }
@@ -51,12 +55,36 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun PantallaIngreso() {
+fun AppNavegacion() {
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController,
+        startDestination = "ingreso"
+    ) {
+        composable("ingreso") {
+            PantallaIngreso(navController)
+        }
+
+        composable("resultado/{nombre}/{imc}") { backStackEntry ->
+            val nombre = backStackEntry.arguments?.getString("nombre") ?: "Usuario"
+            val imc = backStackEntry.arguments?.getString("imc") ?: "0.0"
+
+            PantallaResultado(
+                nombre = nombre,
+                imc = imc,
+                navController = navController
+            )
+        }
+    }
+}
+
+@Composable
+fun PantallaIngreso(navController: NavController) {
     var nombre by remember { mutableStateOf("") }
     var peso by remember { mutableStateOf("") }
     var altura by remember { mutableStateOf("") }
     var mostrarError by remember { mutableStateOf(false) }
-    var resultado by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -119,25 +147,70 @@ fun PantallaIngreso() {
 
                 if (pesoDouble != null && alturaDouble != null && pesoDouble > 0 && alturaDouble > 0) {
                     val imc = pesoDouble / (alturaDouble * alturaDouble)
-                    resultado = "IMC calculado: %.1f".format(imc)
+
+                    val nombreEnviar = if (nombre.isBlank()) {
+                        "Usuario"
+                    } else {
+                        nombre
+                    }
+
                     mostrarError = false
+                    navController.navigate("resultado/$nombreEnviar/$imc")
                 } else {
-                    resultado = ""
                     mostrarError = true
                 }
             }
         ) {
             Text("Calcular IMC")
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(16.dp))
+@Composable
+fun PantallaResultado(
+    nombre: String,
+    imc: String,
+    navController: NavController
+) {
+    val imcDouble = imc.toDoubleOrNull() ?: 0.0
+    val imcFormateado = String.format("%.1f", imcDouble)
 
-        if (resultado.isNotEmpty()) {
-            Text(
-                text = resultado,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Resultado Final",
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = "Hola $nombre, tu resultado es:",
+            fontSize = 20.sp
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            text = "IMC: $imcFormateado",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = {
+                navController.popBackStack()
+            }
+        ) {
+            Text("Volver")
         }
     }
 }
@@ -146,6 +219,20 @@ fun PantallaIngreso() {
 @Composable
 fun PreviewPantallaIngreso() {
     CalculadoraIMCTheme {
-        PantallaIngreso()
+        val navController = rememberNavController()
+        PantallaIngreso(navController = navController)
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PreviewPantallaResultado() {
+    CalculadoraIMCTheme {
+        val navController = rememberNavController()
+        PantallaResultado(
+            nombre = "Alejandro",
+            imc = "24.2",
+            navController = navController
+        )
     }
 }
