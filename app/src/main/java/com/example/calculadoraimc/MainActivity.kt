@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -175,6 +177,20 @@ fun PantallaResultado(
     val imcDouble = imc.toDoubleOrNull() ?: 0.0
     val imcFormateado = String.format("%.1f", imcDouble)
 
+    val categoria = when {
+        imcDouble < 18.5 -> "Bajo peso"
+        imcDouble < 25.0 -> "Peso normal"
+        imcDouble < 30.0 -> "Sobrepeso"
+        else -> "Obesidad"
+    }
+
+    val colorCategoria = when {
+        imcDouble < 18.5 -> Color.Red
+        imcDouble < 25.0 -> Color.Green
+        imcDouble < 30.0 -> Color(0xFFFFA500)
+        else -> Color.Red
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -203,14 +219,28 @@ fun PantallaResultado(
             fontWeight = FontWeight.Bold
         )
 
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            text = categoria,
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = colorCategoria
+        )
+
         Spacer(modifier = Modifier.height(32.dp))
 
-        Button(
-            onClick = {
-                navController.popBackStack()
+        Row {
+            Button(
+                onClick = {
+                    navController.popBackStack()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.DarkGray
+                )
+            ) {
+                Text("Volver")
             }
-        ) {
-            Text("Volver")
         }
     }
 }
@@ -226,12 +256,51 @@ fun PreviewPantallaIngreso() {
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun PreviewPantallaResultado() {
+fun PreviewResultadoBajoPeso() {
     CalculadoraIMCTheme {
         val navController = rememberNavController()
         PantallaResultado(
             nombre = "Alejandro",
-            imc = "24.2",
+            imc = "17.5",
+            navController = navController
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PreviewResultadoPesoNormal() {
+    CalculadoraIMCTheme {
+        val navController = rememberNavController()
+        PantallaResultado(
+            nombre = "Alejandro",
+            imc = "22.4",
+            navController = navController
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PreviewResultadoSobrepeso() {
+    CalculadoraIMCTheme {
+        val navController = rememberNavController()
+        PantallaResultado(
+            nombre = "Alejandro",
+            imc = "27.8",
+            navController = navController
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PreviewResultadoObesidad() {
+    CalculadoraIMCTheme {
+        val navController = rememberNavController()
+        PantallaResultado(
+            nombre = "Alejandro",
+            imc = "31.2",
             navController = navController
         )
     }
