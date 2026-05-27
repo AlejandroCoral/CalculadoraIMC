@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,6 +55,8 @@ fun PantallaIngreso() {
     var nombre by remember { mutableStateOf("") }
     var peso by remember { mutableStateOf("") }
     var altura by remember { mutableStateOf("") }
+    var mostrarError by remember { mutableStateOf(false) }
+    var resultado by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -97,15 +100,44 @@ fun PantallaIngreso() {
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (mostrarError) {
+            Text(
+                text = "Por favor, ingresa valores válidos",
+                color = Color.Red,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+        }
 
         Button(
             onClick = {
-                // En esta versión todavía no calculamos el IMC.
-                // Solo dejamos preparada la interfaz.
+                val pesoDouble = peso.toDoubleOrNull()
+                val alturaDouble = altura.toDoubleOrNull()
+
+                if (pesoDouble != null && alturaDouble != null && pesoDouble > 0 && alturaDouble > 0) {
+                    val imc = pesoDouble / (alturaDouble * alturaDouble)
+                    resultado = "IMC calculado: %.1f".format(imc)
+                    mostrarError = false
+                } else {
+                    resultado = ""
+                    mostrarError = true
+                }
             }
         ) {
             Text("Calcular IMC")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (resultado.isNotEmpty()) {
+            Text(
+                text = resultado,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
