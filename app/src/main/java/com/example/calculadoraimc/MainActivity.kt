@@ -6,15 +6,26 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,7 +42,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    PantallaInicio()
+                    PantallaIngreso()
                 }
             }
         }
@@ -39,7 +50,11 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun PantallaInicio() {
+fun PantallaIngreso() {
+    var nombre by remember { mutableStateOf("") }
+    var peso by remember { mutableStateOf("") }
+    var altura by remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -52,13 +67,53 @@ fun PantallaInicio() {
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold
         )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        TextField(
+            value = nombre,
+            onValueChange = { nombre = it },
+            label = { Text("Ingresa tu nombre") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        TextField(
+            value = peso,
+            onValueChange = { peso = it },
+            label = { Text("Peso en kg") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        TextField(
+            value = altura,
+            onValueChange = { altura = it },
+            label = { Text("Altura en metros") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(
+            onClick = {
+                // En esta versión todavía no calculamos el IMC.
+                // Solo dejamos preparada la interfaz.
+            }
+        ) {
+            Text("Calcular IMC")
+        }
     }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun PreviewPantallaInicio() {
+fun PreviewPantallaIngreso() {
     CalculadoraIMCTheme {
-        PantallaInicio()
+        PantallaIngreso()
     }
 }
